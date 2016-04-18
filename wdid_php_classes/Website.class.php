@@ -2,6 +2,12 @@
 
 namespace wdid;
 require_once( 'Duck.class.php' );
+require_once( 'Indenter.class.php' );
+require_once( 'Session.class.php' );
+require_once( 'TagGenerator.class.php' );
+require_once( 'PhpWrapperForServerSuperglobal.class.php' );
+require_once( 'Inclusion.class.php' );
+require_once( 'ConfigInclusion.class.php' );
 
 class Website extends Duck{
 
@@ -173,6 +179,7 @@ class Website extends Duck{
             ////  **** tidy not yet implemented ****
             ////   could use either php5-tidy
             ////   or html purifier
+            ////   or htmLawed
             ////   or something else similar
             echo $rendered;
         }

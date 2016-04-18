@@ -5,7 +5,7 @@ namespace wdid;
 require_once( 'Duck.class.php' );
 
 //// A simple class to make getting data from the 
-class PhpWrapperServerSuperglobal extends Duck{
+class PhpWrapperForServerSuperglobal extends Duck{
     public function
     __get( $key ){
         switch( $key ){
