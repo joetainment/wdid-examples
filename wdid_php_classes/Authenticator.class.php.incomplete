@@ -1,0 +1,74 @@
+<?php
+
+namespace wdid;
+
+
+
+//// This is super incomplete and should not be used at the moment
+class Authenticator extends Duck {
+    
+    protected $_isAuthenticated = false;
+    
+    
+    
+    
+    ///////////////////////////////////////////////
+    //// All these security sections are somewhat insane.  Demo only!
+    ///////////////////////////
+    public function
+    getIsAuthenticated(){
+        return $this->_isAuthenticated;
+    }
+    
+    public
+    function unAuthenticate(){
+        $this->_isAuthenticated = false;
+    }
+    
+    public function
+    getAuthProxyUsername(){
+        //// This is crazy! only used for demo purposes!
+        return 'wdid';
+    }
+    public function
+    getAuthProxyPassword(){
+        //// This is crazy! only used for demo purposes!
+        return 'wdid-0wdid';
+    }
+    public function
+    getAuthProxyPasswordHash(){
+        $correct_password = $this->getAuthProxyPassword();
+        $salt =  $this->getAuthProxySalt();
+        $hashedKnownPassword = hash_pbkdf( 'sha512', $correct_password, $salt );        
+        return $hashedKnownPassword;
+    }
+    
+    public function
+    getAuthProxySalt(){
+        return 'jB23OTX4gPNYSraG0kJVYhsjdCKErl2CrsZbYxvlum9ApBefyWYy2pL' .
+            '5fLSTUWvlOFxZRy0thWugt7dHj5vEMiyZerJoZombcq' . 
+            '7CdCiR1P1aMt2cokvHFHAgRNuirv';
+    }
+    
+    public function
+    authenticate( $username, $passwordHashed ){
+        
+        //// This is an example proxy salt only.  Every time every users sets or changes
+        //// a password, a new random salt should be generated using a crypto rand function
+        //// and stored for the user, similar to how the hash is stored.
+        $salt =  $this->getAuthProxySalt();
+        //// Password
+        ////   Obviously the password shouldn't be hardcoded like this, but
+        ////   for this simple example it is.
+        ////   Normally this would come out of user input, and be verified
+        ////   to ensure it was sufficiently secure.
+        $correct_password = $this->getAuthProxyPassword();
+        
+        $this->_isAuthenticated = false;
+        if (  $username === $this->getAuthProxyUsername()  ){
+            if ($passwordHashed === $this->getAuthProxyPasswordHash()  ){
+                    $this->_isAuthenticated = true;
+            }
+        }
+    }
+}

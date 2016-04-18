@@ -1,0 +1,1 @@
+In this example, content is included by using the "Inclusion" class.

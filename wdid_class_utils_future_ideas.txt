@@ -1,0 +1,442 @@
+
+
+Everything here is a scratchpad of ideas/brainstorming.  Nothing is finished/ready.
+
+
+
+
+PHP's concept of overloading and operators (see Overloading, and Array Operators) is not like C++'s concept. I don't believe it is possible to overload operators such as +, -, [], etc.
+
+Possible Solutions
+
+    Implement SPL ArrayObject (as mentioned by cbeer).
+    Implement Iterator (if ArrayObject is too slow for you).
+    Use the PECL operator extension (as mentioned by Benson).
+
+shareimprove this answer
+	
+edited Feb 25 '13 at 16:03
+Pieter Bos
+6621617
+	
+answered Apr 24 '09 at 22:00
+grammar31
+1,1281816
+	
+1 	 
+	
+Better than the Iterator is the SPL ArrayObject, which I've linked to below. It provides the whole slew of array functionality. – cbeer Apr 24 '09 at 22:07 
+
+
+
+
+<?php
+class A implements ArrayAccess {
+    private $data = array();
+
+    public function offsetGet($offset) {
+        return isset($this->data[$offset]) ? $this->data[$offset] : null;
+    }
+
+    public function offsetSet($offset, $value) {
+        if ($offset === null) {
+            $this->data[] = $value;
+        } else {
+            $this->data[$offset] = $value;
+        }
+    }
+
+    public function offsetExists($offset) {
+        return isset($this->data[$offset]);
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->data[$offset]);
+    }
+}
+
+$obj = new A;
+$obj[] = 'a';
+$obj['k'] = 'b';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+    GetTypeAndSuperTypes( $v ){
+        $type_stage_one = gettype( $v );
+        if ( $type_stage_one === 'object' ){
+            $type_final = [ ] ;
+            try {
+                $type_stage_two = get_class( $v );
+                if ($type_stage_two !== false ){
+                    $type_final = $type_stage_two;
+                }
+            }
+            finally {
+                return $type_final;
+            }
+        }
+        else {
+            return [ $type_stage_one ];
+        }
+    }
+*/
+
+
+
+
+
+/*
+class DatabaseConnector {
+    
+    protected $dc;
+    
+    protected $user;
+    protected $pass;
+    protected $server;
+    protected $type;
+    protected $name;
+    protected $charset;
+    protected $port;
+    
+    function __construct( $args ){
+        assert( gettype($args)==='array' );
+
+        $this->user = $args['user'];
+        $this->pass = $args['pass'];
+        $this->server = $args['server'];
+        $this->type = $args['type'];
+        $this->name = $args['name']; 
+
+        $this->charset = WdidUtils::ArrGetWithFallback(
+            $args, 'charset', 'utf8'
+        );
+        
+        $this->prefix = WdidUtils::ArrGetWithFallback(
+            $args, 'prefix', ''
+        );        
+        
+        $this->port = WdidUtils::ArrGetWithFallback(
+            $args, 'port', 3306
+        );
+        
+        $this->options = WdidUtils::ArrGetWithFallback(
+            $args, 'options', []
+        );
+    }
+    
+    function connect(){
+        if (  $this->hasDatabase() === false ){
+            $this->createDatabase( );
+        }
+
+        
+        $dc = new medoo( [
+                // required
+                'database_type' => $this->type,
+                'database_name' => $this->name,
+                'server' => $this->server,
+                'username' => $this->user,
+                'password' => $this->pass,
+                'charset' => $this->charset,
+             
+                // [optional]
+                'port' => $this->port,
+             
+                // [optional] Table prefix
+                'prefix' => $this->prefix,
+             
+                // driver_option for connection, read more from http://www.php.net/manual/en/pdo.setattribute.php
+                'option' => $this->options
+            ]
+        );
+        $this->dc = $dc;
+    }
+    
+    function
+    createDatabase( $name=null ){
+        if (  $name===null  )   $name = $this->name;
+        //// dc will be database_connection
+        $dc = new PDO( $this->type . ':host=' . $server,  $this->user,  $this->pass  );
+        $dc->exec('CREATE DATABASE '. $this->name .';' );
+    }
+    
+    function
+    hasDatabase( $name=null ){
+        if (  $name===null  )   $name = $this->name;
+        $dc = new PDO( $this->type . ':host=' . $this->server . ';port=' . $this->port,  $this->user,  $this->pass  );
+        $databases_found = $this->getDatabasesAsArray($dc);
+        if ( in_array( $name,  $databases_found )  ) return true;
+        else return false;
+    }
+    
+    public function
+    getDatabasesAsArray( $dc=null ){
+        if ($dc===null) {
+            $dc = new PDO( $this->type . ':host=' . $this->server,  $this->user,  $this->pass  );
+        }
+        assert( gettype( $dc ) === 'object' );
+        assert( is_a( $dc, 'PDO' )  );
+        
+        $databases_query_result = $dc->query( 'SHOW DATABASES' );
+
+        $databases_found = [ ];
+        while  (    (  $database_found = $databases_query_result->fetchColumn(0)  )  !==false    ){
+            array_push(  $databases_found,  $database_found  );
+        }
+        return $databases_found;
+    }    
+    public function
+    getDc( ){
+        return $this->dc;
+    }
+    
+    public function
+    createTable( $tableName ){        
+        $this->dc->pdo->exec("CREATE TABLE table (
+            c1 INT STORAGE DISK,
+            c2 INT STORAGE MEMORY
+        ) ENGINE NDB;");
+
+        //query(
+        //   'CREATE TABLE '. $tableName .' (
+        //        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,    
+        //        data JSON
+        //    ) ENGINE NDB;'
+        //); 
+                
+    }
+    
+    public function
+    showTables(){
+                $sql = "SELECT 
+          TABLE_NAME
+        FROM information_schema.TABLES 
+        WHERE
+          TABLE_TYPE='BASE TABLE'
+          AND TABLE_SCHEMA='" . $this->name . "';";
+          $sql = "SHOW TABLES";
+          return $this->dc->query( $sql )->fetchAll();
+    }
+    
+    public function
+    queryAsArray( $sql ){
+        $q = $this->dc->query($sql);
+        return $this->queryToArray( $q );
+    }
+    public function
+    queryToArray( $query ){
+        return $query->fetchAll();
+    }
+    
+}
+
+
+$connector = new DatabaseConnector( [
+    'user'=>'root',
+    'pass'=>'wdid00wdid',
+    'server'=>'localhost',
+    'type'=>'mysql',
+    'name'=>'wdid_test_site_y2016m02d20'
+
+]);
+
+$connector->connect();
+
+$connector->createTable( 'test1' );
+
+$connector->getDc()->pdo->exec("
+    CREATE TABLE IF NOT EXISTS jsontest (
+    data JSON
+    );"
+
+);
+
+$connector->getDc()->insert( "test_table", ['key1'=>'value1', 'key2'=>'value2' ]  );
+
+$tmp = $connector->showTables();
+
+
+var_dump( $tmp );
+
+*/
+
+
+
+
+
+
+/*
+
+    //// Get An Array Of All the Databases in a mysql server connection
+    public static function
+    PdoGetDatabasesAsArray( $database_connection ){
+        assert( gettype( $database_connection ) == 'object' );
+        assert( is_a( $database_connection, 'PDO' )  );
+        
+        $databases_query_result = $database_connection->query( 'SHOW DATABASES' );
+
+        $databases_found = [ ];
+        while  (    (  $database_found = $databases_query_result->fetchColumn(0)  )  !==false    ){
+            array_push(  $databases_found,  $database_found  );
+        }
+        return $databases_found;
+    }
+
+
+    
+}
+*/
+
+
+
+
+
+// get_object_vars — Gets the properties of the given object
+
+/*
+    get_class_methods() - Gets the class methods' names
+    get_class_vars() - Get the default properties of the class
+
+
+
+
+
+    // Enjoy
+    $database->insert('account', [
+        'user_name' => 'foo',
+        'email' => 'foo@bar.com',
+        'age' => 25,
+        'lang' => ['en', 'fr', 'jp', 'cn']
+    ]);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+/*
+
+public PhpWrapper**FOR SOMETHING** extends Duck{
+    
+    private static $_mappingArrayStc;
+    
+    public static function
+    getMappingAray( $key ){
+        
+        if ( gettype(self::$_mappingArrayStc)==="array" ){
+            return self::$_mappingArrayStc;
+        }else
+        {
+            self::$_mappingArrayStc = [
+                __
+            ]
+            return self::$_mappingArrayStc
+        }
+    }
+    
+    public function
+    __get( $key ){
+        ***do something via mapping array***
+    }
+}
+*/
+
+
+
+
+
+
+
+
+    //public function
+    //getSmartyPageByOptions( $opts ){
+    //    $vars = Arr::GetWDefault( $opts, 'vars', null );
+    //    if (  gettype($vars)!='array'  )  $vars = [];
+    //    // as of this point, $vars is guaranteed to be an array
+    //    
+    //    // if page given isn't valid, this will cause
+    //    // a wanted error later when displayed, that's good
+    //    $page = Arr::GetWDefault( $opts, 'page', null );        
+    //    
+    //    //// render smarty and return
+    //    $smarty = new Smarty;
+    //    foreach ( $vars  as  $key => $value ){
+    //        $smarty->assign( $key, $value );
+    //    }
+    //    $r = $smarty->fetch( $page );
+    //    
+    //    return $r;
+    //
+    
+    //public function
+    //is_page( $address_to_test){
+    //    if ($address_to_test == $this->data['page']){
+    //      return true;
+    //    }
+    //    else return false;
+    //}
+    
+    
+    
+    
+
+//// The concept of null is so terribly inconsistent, it would be nice
+//// to have a non broken alternative, but haven't found a way to
+//// to make that work well yet, other than a static
+//// NullType.GetNullType()
+//// 
+//// This would introduce all kind of overhead
+//// and in general would be really ugly/hackish
+////
+//// Thus, this whole thing is disabled
+//class NullType {
+//    private static $_isInitialized = false;
+//    private static $_NullTypeInstance;
+//
+//    public static function
+//    GetNullType(){
+//        if ( self::$isInitialized===true ){
+//            return self::$NullTypeInstance;
+//        }
+//        else {
+//            self::$isInitialized = true;
+//            self::$NullTypeInstance = new NullTypeInstance();
+//            return self::$NullTypeInstance;
+//        }
+//    }
+//}
+    

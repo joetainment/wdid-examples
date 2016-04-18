@@ -1,0 +1,14 @@
+
+//// Beware of using dot syntax. Dot syntax is a common source of errors!
+//// PHP is weird!  Use   ->  or   ::  instead!
+
+
+//// Example:  Using a static function
+//echo Utils::EchoLine();
+
+//// Example:  Creating an instance of a class
+//$myWebsiteInstance = new Website();
+
+
+//// Example:  Calling a class
+// $myWebsiteInstance->render();
