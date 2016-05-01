@@ -1,9 +1,9 @@
 ## Define classes and functions
 ##    these will be instantiated afterwards
 
-class RestructionWebsite
+class Website
     constructor: ->
-        @name = "Restruction Website Main Class Instance"
+        @name = "Website Main Class Instance"
         @doc = $(document)
         @win = $(window)
         @bg_image_org_width = 600
@@ -124,7 +124,7 @@ class RestructionWebsite
 ## Create an instance of the website,
 ## jquery 'ready' stuff is handled in the constructor
 
-website = new RestructionWebsite
+website = new Website
 
 
 
