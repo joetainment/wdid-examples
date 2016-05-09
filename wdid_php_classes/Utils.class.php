@@ -14,7 +14,23 @@ class Utils {
             return $arr[$key];
         }
         else return $fallback;
+    }     //// a getsafe static fuction!
+    public static function
+    GetWDefaultNoRefKeyOrFallback( &$arr, $key, $fallback ){
+        if (    array_key_exists( $key, $arr )    ){
+            return $arr[$key];
+        }
+        else return $fallback;
+    }   
+    //// a getsafe static fuction!
+    public static function
+    GetWDefaultNoRefKey( &$arr, $key, &$fallback ){
+        if (    array_key_exists( $key, $arr )    ){
+            return $arr[$key];
+        }
+        else return $fallback;
     }
+
     
     public static function
     GetWDefaultNoRefFallback( &$arr, &$key, $fallback ){
@@ -46,7 +62,9 @@ class Utils {
          echo self::RepeatTextAsLines( '', $repeats, "<br>" );
     }
     
-    
+        public static function    IsAjax(){        $x = 'HTTP_X_REQUESTED_WITH';        $test =            isset($_SERVER[$x])
+            &&            strtolower($_SERVER[$x]) == 'xmlhttprequest'        ;        return $test;
+    }
     //// RepeatTextAsLines
     ////   Often we need to repeat some piece of text several times.
     ////   and sometimes we want a line break in between
