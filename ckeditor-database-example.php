@@ -5,21 +5,19 @@ use \wdid\DatabaseConnectionInfo as DatabaseConnectionInfo;
 use \wdid\DatabaseManager as DatabaseManager;
 use \wdid\Utils as Utils;
 use \wdid\Duck as Duck;
-//////////////////////////////////////  Html for $open_from_obfunction globalGetBody(){ob_start();?></head>
-<body>
+//////////////////////////////////////  Html for $open_from_obfunction globalGetBody(){ob_start();?></head>
+<body>	<div style="float: right; width: 400px;">		<h1>Ajax Examples</h1>		<a href="#" id="ajaxExampleSetEditorToPresetText" >			Ajax Example - Set Editor To Preset Text		</a>		<br><br>		<a href="#" id="ajaxExampleCensorTextInEditor" onClick="return false;">			Ajax Example - Censor Text In Editor		</a>		<br><br>		<a href="ckeditor-database-example.php">			Revert to before save.		</a>		<br><br>		<a href="ckeditor-database-example.php?nuke=1">			Nuke the entire database!		</a>			<h1> Preview: </h1>		<div id="preview"></div>	</div>	
+	<div style="width: 500px;">		<h1 style="margin-top: 5px;margin-bottom: 5px;">Ckeditor Example</h1>	
+		<form
+			action="ckeditor-database-example.php"
+			method="post"
+			>
 
-	<form
-		action="ckeditor-database-example.php"
-		method="post"
-		>
-
-		<textarea name="ckeditor">
-		</textarea>
-		<input type="submit" value="Save">
-	</form>
-    <p id="ajaxExampleSetEditorToPresetText" >Ajax Example - Set Editor To Preset Text</p>
-    <p id="ajaxExampleCensorTextInEditor" >Ajax Example - Censor Text In Editor</p>    <a href="ckeditor-database-example.php?nuke=1">        Nuke the entire database!    </a>
-	<script>
+			<textarea name="ckeditor">
+			</textarea>
+			<input type="submit" value="Save">
+		</form>	</div>			
+	<script>        function onCkeditorChange(){            var contents = ckeditor.getData();            $( "#preview" ).empty();            $( "#preview" ).append( contents );        }		
 		//// note, typically do this in OnReady
 		//// or something like that, inside your
 		//// main website class, this is just a // simple example!
@@ -32,31 +30,22 @@ use \wdid\Duck as Duck;
 		//// CSS won't match page, so eliminate it
 		ckeditor.config.contentsCss = "";
 		//// We could attach some css as well
-		// ckeditor.addContentsCss( "you-css-here.css" )        
-        $('#ajaxExampleSetEditorToPresetText').click( function(){
+		// ckeditor.addContentsCss( "you-css-here.css" )						function onResponseForCkeditorDataReplacement(response){                    var r = JSON.parse( response );                    var newData = r['ckeditorData'];                    ckeditor.setData( newData )        }        
+        $('#ajaxExampleSetEditorToPresetText').click( function(ev){			ev.preventDefault();			ev.stopPropagation();
             $.ajax({
                 url: "ckeditor-database-example.php",
                 method: "POST",
-                data: {'action':'SetEditorToPresetText'},
-                success: function(response){
-                    var r = JSON.parse( response );
-                    var newData = r['ckeditorReplacement'];
-                    ckeditor.setData( newData )
-                }
+                data: {'action':'SetEditorToPresetText'},				//success: onResponseForCkeditorDataReplacement                success: onResponseForCkeditorDataReplacement
             });
         });
-        $('#ajaxExampleCensorTextInEditor').click( function(){
+        $('#ajaxExampleCensorTextInEditor').click( function(ev){			ev.preventDefault();			ev.stopPropagation();
             $.ajax({
                 url: "ckeditor-database-example.php",
                 method: "POST",
                 data: {                    'action':'CensorTextInEditor',                    'ckeditorData':ckeditor.getData()                },
-                success: function(response){
-                    var r = JSON.parse( response );
-                    var newData = r['ckeditorData'];
-                    ckeditor.setData( newData )
-                }
+                success: onResponseForCkeditorDataReplacement
             });
-        });
+        });				//// Real time preview        ckeditor.on( 'change',  onCkeditorChange );
 	</script>    <br>    <?php$body_from_ob = ob_get_contents();echo " ";ob_end_clean();return $body_from_ob;}class CkEditorExampleWebpage extends Duck {    public $ckeditorData = "";    public function __construct( $opts ){        //// info must be given, so correct to error if no key        $this->connectionInfo = $opts['connectionInfo'];    }
     public function    process(){        if (  Utils::IsAjax()  ){
             $this->processAjax();        }        else $this->processPage();    }    public function processAjax(){        $action = Utils::GetWDefaultNoRefKeyOrFallback( $_POST, 'action', '' );        switch($action) {
@@ -74,7 +63,7 @@ use \wdid\Duck as Duck;
     }
     public function
     respondToSetEditorToPresetText($action){
-        $r = ['ckeditorReplacement'=>'this was generated by ajax response'];
+        $r = ['ckeditorData'=>'this was generated by ajax response'];
         $response = json_encode( $r );
         echo $response;
     }    public function    processPage(){        /////////////////////        //// Continue default processing if not an ajax request        ////        //// We could do something to save to files, as shown in other        //// example.        //$this->syncCkeditorDataToFile();        $this->dbMan = new wdid\DatabaseManager( $this->connectionInfo );
@@ -154,5 +143,5 @@ use \wdid\Duck as Duck;
 $host = 'localhost';
 $dbName = 'ckeditor';
 $user = 'root';
-$pass = 'wdid00wdid';
+$pass = '';
 $connectionInfo = new wdid\DatabaseConnectionInfo( $host , $dbName, $user, $pass );$opts = ["connectionInfo"=>$connectionInfo];$webpage = new CkeditorExampleWebpage( $opts );$webpage->process();
