@@ -9,7 +9,7 @@
         //// Provide the user with some feedback
         console.log( 'done' );}//// Warn the user and prompt in order to run the function!console.log( "About to add all, commit, and push to origin master!");
 console.log( "This is dangerous!");
-console.log( "Are you sure? (y key and enter to continue, or n key and enter to quit" );//// This part actually handles the io//// we really just check for the first letter of the response to be//// yprocess.stdin.resume();
+console.log( "Are you sure? (y key and enter to continue, or n key and enter to quit)" );//// This part actually handles the io//// we really just check for the first letter of the response to be//// yprocess.stdin.resume();
 process.stdin.setEncoding('utf8');
 var util = require('util');
 process.stdin.on('data', function (text) {
