@@ -1,0 +1,1 @@
+<?php header("Location: ckeditor-database-example.php");
