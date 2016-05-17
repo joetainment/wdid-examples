@@ -7,10 +7,7 @@ var child_process = require('child_process');//// This function will run if we
             child_process.execSync( cmds[i] );
         }
 
-        console.log( 'done' );
-        console.log('Command-line input received:');
-        console.log('  Username: ' + result.username);
-        console.log('  Password: ' + result.password);}//// Warn the user and prompt in order to run the function!console.log( "About to add all, commit, and push to origin master!");
+        console.log( 'done' );}//// Warn the user and prompt in order to run the function!console.log( "About to add all, commit, and push to origin master!");
 console.log( "This is dangerous!");
 console.log( "Are you sure?" );process.stdin.resume();
 process.stdin.setEncoding('utf8');
