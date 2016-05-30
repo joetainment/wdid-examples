@@ -1,0 +1,1 @@
+cd %~dp0node ./git-add-commit-and-push-to-origin-master.js

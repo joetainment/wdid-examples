@@ -5,12 +5,26 @@ namespace wdid;
 
 require_once( 'Duck.class.php' );
 
+class Dictionary extends ArrayObject {
 
-//// PHP's Array functions are a bit of a mess and incomplete.
-////   we will put useful array related functions into our own Arr class
-class Dictionary extends Duck implements \ArrayAccess {
-    
-    
+    static function Wrapped( $a ){
+        //// If given a WdidArray of subclass instance,
+        //// return it unchanged
+        if ( $a instanceof ArrayObject ){
+            return $a;
+        }    
+        //// Otherwise, return a new WdidArray instance.
+        return  new WdidArray( $a );
+            //// note that this could be stricter, if we wanted to
+            //// disallow wrapping certain types.
+    }
+
+    function getWithFallback( $key, $fallback ){
+        if (  array_key_exists( $key, $this )  ){
+            return $this[$key];
+        }
+        return $fallback;
+    }
     //// Get safely, with a default fallback, from the instance
     ////  this one potential problem with this is it doesn't work when adding a null key.
     ////  it's getWFallback or GetWDefault
@@ -19,59 +33,8 @@ class Dictionary extends Duck implements \ArrayAccess {
         return self::GetWDefault( $this->_arr, $key, $fallback );
         //// this will return null instead of causing an error,
         //// if $key doesn't exist;
-    }
-    
-    //// This one forces the user to explicitly state a fallback
-    public function
-    getSafe( &$key, &$fallback ){
-        return self::GetWDefault( $this->_arr, $key, $fallback );
-    }
-    
-    //// This follows standard behavior for getting from array,
-    //// with the same errors as usual
-    public function
-    getUnsafe( &$key ){
-        return $this->_arr[$key];
-    }
-    
-    //// Only set if not null
-    public function
-    set( &$key, &$value ){
-        if ( $key!==null ){
-            $this->_arr[$key] = $value;
-        }
-    }
-    public function
-    setUnsafe( &$key, &$value ){
-        $this->_arr[$key] = $value;
-    }
-    
-    //public function
-    //removeNullKeys(){
-    //    unset( 
-    //}
-    
-    public function offsetGet($offset) {
-        return isset($this->data[$offset]) ? $this->data[$offset] : null;
-    }
-
-    public function offsetSet($offset, $value) {
-        if ($offset === null) {
-            $this->data[] = $value;
-        } else {
-            $this->data[$offset] = $value;
-        }
-    }
-
-    public function offsetExists($offset) {
-        return isset($this->_arr[$offset]);
-    }
-
-    public function offsetUnset($offset) {
-        unset($this->_arr[$offset]);
-    }    
- 
-//// Notes about keys in arrays
+    }
+}//// Notes about keys in arrays
 // the key can either be an integer or a string. The value can be of any type.
 // Additionally the following key casts will occur:
 //
