@@ -1,1 +1,4 @@
-cd %~dp0node ./git-add-commit-and-push-to-origin-master.js
+cd %~dp0
+
+node.exe git-add-commit-and-push-to-origin-master.js
+
