@@ -1,9 +1,2 @@
-This version adds:
-    - php - tests for ajax, and if so, run appropriate response
-    - php   a function dedicated to handling an ajax action
-            called "SimpleRequest"
-    - php - utility function for getting from array with
-            default fallback
-    - html - a button to send an ajax request
-    - js   - on click function, sends ajax to server
-    - js   - on response function, displays received ajax response
+note that the utils class was modified to provide functions for getting from arrays with
+defaults
