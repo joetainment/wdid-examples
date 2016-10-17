@@ -5,7 +5,7 @@ namespace wdid;
 
 require_once( 'Duck.class.php' );
 
-class Dictionary extends ArrayObject {
+class Dictionary extends \ArrayObject {
 
     static function Wrapped( $a ){
         //// If given a WdidArray of subclass instance,
@@ -50,5 +50,3 @@ require_once( 'Duck.class.php' );
 //   actually be stored under "".
 // Arrays and objects can not be used as keys. Doing so will
 //   result in a warning: Illegal offset type  
-  
-}
