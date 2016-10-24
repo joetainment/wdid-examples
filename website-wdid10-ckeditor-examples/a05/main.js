@@ -25,13 +25,37 @@ class CKEditorSimpleExample {
 		////  We will get back an instance
 		////  of the CKEditor.editor class,
         ////  which we will store on 'this'
-		this.ckeditor = CKEDITOR.replace( 'editor1' );
-
+		this.ckeditor = CKEDITOR.replace( 'ckeditor' );
+        if (  window.hasOwnProperty('PhpVars')  ){
+            if (  PhpVars.hasOwnProperty('ckeditor')  ){
+                this.ckeditor.setData( PhpVars.ckeditor )        
+            }
+        }
+        //// Optionally, here, you could setup CSS for the editor
+        /* Look into: 
+        CKEDITOR.config.contentsCss
+        CKEDITOR.config.bodyClass
+        CKEDITOR.config.bodyId
+        config.contentsCss = '/css/mystyles.css';
+        or
+        config.contentsCss = ['/css/mysitestyles.css', '/css/anotherfile.css'];
+        */
+        
+        
+        
+        // or, try this.ckeditor.setData( PhpVars.ckeditorData );
+        //     catch (Exception e ) console.log( e.message );
         $('#clear').on(  'click', this.onClearButtonClicked.bind(this)  );
 
-        $('#SimpleRequestButton').on( 'click',
-            this.onSimpleRequestButtonClicked.bind(this)
+        $('#SaveRequestButton').on( 'click',
+            this.onSaveRequestButtonClicked.bind(this)
         );
+        
+        
+        
+        
+        
+        
         
 	}
     
@@ -40,23 +64,24 @@ class CKEditorSimpleExample {
     }
     
     
-    onSimpleRequestButtonClicked(){
+    onSaveRequestButtonClicked(){
         $.ajax({
             url: "",
             method: "POST",
             data: {
-                'action':'SimpleRequest',
-				'ckeditor': this.ckeditor.getData()
+                'action':'SaveRequest',
+                'ckeditor': this.ckeditor.getData()
             },
-            success: this.onSimpleRequestResponse.bind(this)
+            success: this.onSaveRequestResponse.bind(this)
         });
     }
     
-    onSimpleRequestResponse(response){
+    onSaveRequestResponse(response){
         var r = JSON.parse( response );
-        var ckeditorText = r['ckeditor'];
-        $( "#SimpleRequestResponseDiv" ).html( ckeditorText );
+        var ckeditor = r['ckeditor'];
+        $( "#SaveRequestResponseDiv" ).html( ckeditor );
     }
+    
     
 }
 
